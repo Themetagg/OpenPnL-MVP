@@ -1,14 +1,6 @@
-import { PrismaClient } from "@prisma/client";
+// Prisma client placeholder for MVP.
+// The running app does not use Prisma at runtime; this file exists only
+// to keep the project structure future-ready without requiring @prisma/client.
 
-// Prevent multiple PrismaClient instances in dev hot-reload
-const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
-
-export const prisma =
-  globalForPrisma.prisma ||
-  new PrismaClient({
-    log: ["error", "warn"],
-  });
-
-if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.prisma = prisma;
-}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const prisma: any = null;
