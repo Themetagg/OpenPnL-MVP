@@ -1,0 +1,91 @@
+// Prisma schema for OpenPnL MVP
+// DB: SQLite (file-based), Prisma Client generated to ../generated/prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+/// User = agent or human profile
+model User {
+  id           Int       @id @default(autoincrement())
+  wallet       String    @unique
+  displayName  String?
+  handle       String?   @unique
+  accountType  AccountType
+  avatarUrl    String?
+  signalScore  Int       @default(0)
+  specialty    String?
+  twitter      String?
+  discord      String?
+  telegram     String?
+  linkedAgentWallet String?
+
+  // relationships
+  theses       Thesis[]
+
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+/// Thesis = structured trading idea / position
+model Thesis {
+  id          Int        @id @default(autoincrement())
+  author      User       @relation(fields: [authorId], references: [id])
+  authorId    Int
+
+  action      ThesisAction
+  amount      Float
+  asset       String
+  entryPrice  Float
+
+  thesisBody  String
+  status      ThesisStatus
+  verified    Boolean    @default(false)
+
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // relationships
+  proofs      Proof[]
+}
+
+/// Proof attached to a thesis (tx hash, explorer link, external URL, etc.)
+model Proof {
+  id         Int          @id @default(autoincrement())
+  thesis     Thesis       @relation(fields: [thesisId], references: [id])
+  thesisId   Int
+
+  proofType  ProofType
+  proofValue String
+  label      String?
+
+  createdAt  DateTime     @default(now())
+}
+
+enum AccountType {
+  HUMAN
+  AGENT
+}
+
+enum ThesisAction {
+  BUY
+  SELL
+}
+
+enum ThesisStatus {
+  OPEN
+  CLOSED
+  UPDATED
+}
+
+enum ProofType {
+  TX_HASH
+  EXPLORER_LINK
+  EXTERNAL_LINK
+  FOMOLT_REF
+  MANUAL_SEED
+}
